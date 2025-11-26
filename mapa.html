@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora do Terreno</title>
+  <style>
+    body { font-family: system-ui, sans-serif; padding: 1.5rem; background: #f4f4f4; }
+    .card { background: #fff; padding: 1.2rem; margin-bottom: 1rem; border-radius: 10px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    label { font-size: .9rem; display: block; margin-bottom: .2rem; }
+    input { width: 100%; padding: .4rem; font-size: .95rem; box-sizing: border-box; }
+    .result-row { display: flex; justify-content: space-between; margin: .25rem 0; }
+    .result-value { font-weight: 600; }
+    .warning { background: #fff3cd; padding: .5rem; border-radius: 5px; margin-top: .5rem; font-size: .85rem; }
+    .total-display { background: #e9ecef; padding: .5rem; border-radius: 5px; margin-top: .5rem; text-align: center; font-weight: 600; }
+    .info { background: #e7f3ff; padding: .5rem; border-radius: 5px; margin-bottom: .5rem; font-size: .85rem; }
+  </style>
+</head>
+<body>
+  <h1>Calculadora do Terreno</h1>
+  <div class="card">
+    <h2>Dados</h2>
+    <div class="grid">
+      <div><label>Valor total do terreno (R$)</label><input id="totalValue" type="number" value="20000000"></div>
+      <div><label>% do valor total da área que vamos ficar</label><input id="keepPercent" type="number" step="0.01" value="10"></div>
+      <div><label>Taxa advogado (%)</label><input id="lawyerFee" type="number" step="0.01" value="1.5"></div>
+      <div><label>ITCMD RJ (%)</label><input id="itcmd" type="number" step="0.01" value="8"></div>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>Percentuais da herança (fixos)</h2>
+    <div class="info">Bia: 33.33% | Alberto: 5.55% | Vinicius: 5.55% | Thomas: 5.55%</div>
+  </div>
+  
+  <div class="card">
+    <h2>Percentuais do terreno que vamos ficar</h2>
+    <div class="grid">
+      <div><label>Bia (%)</label><input id="biaLand" type="number" step="0.01" value="40"></div>
+      <div><label>Alberto (%)</label><input id="albertoLand" type="number" step="0.01" value="20"></div>
+      <div><label>Vinicius (%)</label><input id="viniciusLand" type="number" step="0.01" value="20"></div>
+      <div><label>Thomas (%)</label><input id="thomasLand" type="number" step="0.01" value="20"></div>
+    </div>
+    <div class="total-display" id="totalPercent">Total: 100%</div>
+    <div class="warning" id="warning" style="display:none;">⚠️ A soma dos percentuais não é 100%</div>
+  </div>
+  
+  <div class="card">
+    <h2>Resultados</h2>
+    <div id="results"></div>
+  </div>
+<script>
+const fmt = v => new Intl.NumberFormat("pt-BR", {style:"currency",currency:"BRL"}).format(v);
+const ids = ["totalValue","keepPercent","lawyerFee","itcmd","biaLand","albertoLand","viniciusLand","thomasLand"];
+const inp = ids.reduce((o,id) => (o[id]=document.getElementById(id),o), {});
+
+const inherit = {bia: 33.33, alberto: 5.55, vinicius: 5.55, thomas: 5.55};
+
+function calc(){
+  const t = +inp.totalValue.value || 0;
+  const k = +inp.keepPercent.value || 0;
+  const lawyerPct = +inp.lawyerFee.value || 0;
+  const itcmdPct = +inp.itcmd.value || 0;
+  
+  const kept = t * k / 100;
+  const sale = t - kept;
+  
+  const cousins = sale / 2;
+  const ourTotal = sale / 2;
+  
+  const lawyerCost = ourTotal * (lawyerPct / 100);
+  const itcmdCost = ourTotal * (itcmdPct / 100);
+  const totalFees = lawyerCost + itcmdCost;
+  
+  const landSplits = {
+    bia: +inp.biaLand.value, 
+    alberto: +inp.albertoLand.value, 
+    vinicius: +inp.viniciusLand.value, 
+    thomas: +inp.thomasLand.value
+  };
+  
+  const totalLand = Object.values(landSplits).reduce((sum,v) => sum+v, 0);
+  const rounded = Math.round(totalLand * 100) / 100;
+  totalPercent.textContent = `Total: ${rounded}%`;
+  warning.style.display = Math.abs(rounded - 100) > 0.01 ? 'block' : 'none';
+  
+  results.innerHTML = `
+    <div class='result-row'><div>Valor total:</div><div class='result-value'>${fmt(t)}</div></div>
+    <div class='result-row'><div>Valor da venda:</div><div class='result-value'>${fmt(sale)}</div></div>
+    <div class='result-row'><div>Valor da área que vamos ficar:</div><div class='result-value'>${fmt(kept)}</div></div>
+    <hr>
+    <div class='result-row'><div>Primas (50% da venda):</div><div class='result-value'>${fmt(cousins)}</div></div>
+    <div class='result-row'><div>Nossa parte (50% da venda):</div><div class='result-value'>${fmt(ourTotal)}</div></div>
+    <hr>
+    <div class='result-row'><div>Advogado (${lawyerPct}%):</div><div class='result-value'>${fmt(lawyerCost)}</div></div>
+    <div class='result-row'><div>ITCMD (${itcmdPct}%):</div><div class='result-value'>${fmt(itcmdCost)}</div></div>
+    <div class='result-row'><div><strong>Total de taxas:</strong></div><div class='result-value'><strong>${fmt(totalFees)}</strong></div></div>
+    <hr>` + 
+    Object.entries(landSplits).map(([n,landPct])=>{
+      const name = n.charAt(0).toUpperCase()+n.slice(1);
+      const cashFromInherit = sale * (inherit[n]/100);
+      const landValue = kept * (landPct/100);
+      const fees = cashFromInherit * ((lawyerPct + itcmdPct) / 100);
+      const finalCash = cashFromInherit - landValue - fees;
+      return `
+        <div style="margin-top:.8rem"><strong>${name}</strong></div>
+        <div class='result-row'><div>• Dinheiro da herança (${inherit[n]}%):</div><div class='result-value'>${fmt(cashFromInherit)}</div></div>
+        <div class='result-row'><div>• Valor do terreno (${landPct}%):</div><div class='result-value'>${fmt(landValue)}</div></div>
+        <div class='result-row'><div>• Taxas (${lawyerPct + itcmdPct}%):</div><div class='result-value'>${fmt(fees)}</div></div>
+        <div class='result-row'><div>• <strong>Total em dinheiro:</strong></div><div class='result-value'><strong>${fmt(finalCash)}</strong></div></div>`;
+    }).join('');
+}
+
+ids.forEach(id => inp[id].addEventListener("input", calc));
+calc();
+</script>
+</body>
+</html>
