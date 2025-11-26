@@ -14,42 +14,112 @@
     .warning { background: #fff3cd; padding: .5rem; border-radius: 5px; margin-top: .5rem; font-size: .85rem; }
     .total-display { background: #e9ecef; padding: .5rem; border-radius: 5px; margin-top: .5rem; text-align: center; font-weight: 600; }
     .info { background: #e7f3ff; padding: .5rem; border-radius: 5px; margin-bottom: .5rem; font-size: .85rem; }
+    
+    #login { 
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%; 
+      background: #f4f4f4; 
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      z-index: 9999;
+    }
+    #login .card { 
+      max-width: 300px; 
+      text-align: center; 
+    }
+    #login input { 
+      margin: 1rem 0; 
+    }
+    #login button { 
+      width: 100%; 
+      padding: .6rem; 
+      background: #007bff; 
+      color: white; 
+      border: none; 
+      border-radius: 5px; 
+      cursor: pointer; 
+      font-size: .95rem;
+    }
+    #login button:hover { 
+      background: #0056b3; 
+    }
+    .error { 
+      color: #dc3545; 
+      font-size: .85rem; 
+      margin-top: .5rem; 
+    }
+    #content { 
+      display: none; 
+    }
   </style>
 </head>
 <body>
-  <h1>Calculadora do Terreno</h1>
-  <div class="card">
-    <h2>Dados</h2>
-    <div class="grid">
-      <div><label>Valor total do terreno (R$)</label><input id="totalValue" type="number" value="15000000"></div>
-      <div><label>% do valor total da área que vamos ficar</label><input id="keepPercent" type="number" step="0.01" value="10"></div>
-      <div><label>Taxa advogado (%)</label><input id="lawyerFee" type="number" step="0.01" value="1.5"></div>
-      <div><label>ITCMD RJ (%)</label><input id="itcmd" type="number" step="0.01" value="8"></div>
+  <div id="login">
+    <div class="card">
+      <h2>Acesso Restrito</h2>
+      <input type="password" id="password" placeholder="Digite a senha">
+      <button onclick="checkPassword()">Entrar</button>
+      <div id="error" class="error"></div>
     </div>
   </div>
-  
-  <div class="card">
-    <h2>Percentuais da herança (fixos)</h2>
-    <div class="info">B: 33.33% | A: 5.55% | V: 5.55% | T: 5.55%</div>
-  </div>
-  
-  <div class="card">
-    <h2>Percentuais do terreno que vamos ficar</h2>
-    <div class="grid">
-      <div><label>B (%)</label><input id="BLand" type="number" step="0.01" value="40"></div>
-      <div><label>A (%)</label><input id="ALand" type="number" step="0.01" value="20"></div>
-      <div><label>V (%)</label><input id="VLand" type="number" step="0.01" value="20"></div>
-      <div><label>T (%)</label><input id="TLand" type="number" step="0.01" value="20"></div>
+
+  <div id="content">
+    <h1>Calculadora do Terreno</h1>
+    <div class="card">
+      <h2>Dados</h2>
+      <div class="grid">
+        <div><label>Valor total do terreno (R$)</label><input id="totalValue" type="number" value="15000000"></div>
+        <div><label>% do valor total da área que vamos ficar</label><input id="keepPercent" type="number" step="0.01" value="10"></div>
+        <div><label>Taxa advogado (%)</label><input id="lawyerFee" type="number" step="0.01" value="1.5"></div>
+        <div><label>ITCMD RJ (%)</label><input id="itcmd" type="number" step="0.01" value="8"></div>
+      </div>
     </div>
-    <div class="total-display" id="totalPercent">Total: 100%</div>
-    <div class="warning" id="warning" style="display:none;">⚠️ A soma dos percentuais não é 100%</div>
+    
+    <div class="card">
+      <h2>Percentuais da herança (fixos)</h2>
+      <div class="info">B: 33.33% | A: 5.55% | V: 5.55% | T: 5.55%</div>
+    </div>
+    
+    <div class="card">
+      <h2>Percentuais do terreno que vamos ficar</h2>
+      <div class="grid">
+        <div><label>B (%)</label><input id="BLand" type="number" step="0.01" value="40"></div>
+        <div><label>A (%)</label><input id="ALand" type="number" step="0.01" value="20"></div>
+        <div><label>V (%)</label><input id="VLand" type="number" step="0.01" value="20"></div>
+        <div><label>T (%)</label><input id="TLand" type="number" step="0.01" value="20"></div>
+      </div>
+      <div class="total-display" id="totalPercent">Total: 100%</div>
+      <div class="warning" id="warning" style="display:none;">⚠️ A soma dos percentuais não é 100%</div>
+    </div>
+    
+    <div class="card">
+      <h2>Resultados</h2>
+      <div id="results"></div>
+    </div>
   </div>
-  
-  <div class="card">
-    <h2>Resultados</h2>
-    <div id="results"></div>
-  </div>
+
 <script>
+function checkPassword() {
+  const pwd = document.getElementById('password').value;
+  const error = document.getElementById('error');
+  
+  if (pwd === 'salgadofilho') {
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('content').style.display = 'block';
+    calc();
+  } else {
+    error.textContent = 'Senha incorreta';
+  }
+}
+
+document.getElementById('password').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') checkPassword();
+});
+
 const fmt = v => new Intl.NumberFormat("pt-BR", {style:"currency",currency:"BRL"}).format(v);
 const ids = ["totalValue","keepPercent","lawyerFee","itcmd","BLand","ALand","VLand","TLand"];
 const inp = ids.reduce((o,id) => (o[id]=document.getElementById(id),o), {});
@@ -112,7 +182,6 @@ function calc(){
 }
 
 ids.forEach(id => inp[id].addEventListener("input", calc));
-calc();
 </script>
 </body>
 </html>
