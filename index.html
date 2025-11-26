@@ -30,16 +30,16 @@
   
   <div class="card">
     <h2>Percentuais da herança (fixos)</h2>
-    <div class="info">Bia: 33.33% | Alberto: 5.55% | Vinicius: 5.55% | Thomas: 5.55%</div>
+    <div class="info">B: 33.33% | A: 5.55% | V: 5.55% | T: 5.55%</div>
   </div>
   
   <div class="card">
     <h2>Percentuais do terreno que vamos ficar</h2>
     <div class="grid">
-      <div><label>Bia (%)</label><input id="biaLand" type="number" step="0.01" value="40"></div>
-      <div><label>Alberto (%)</label><input id="albertoLand" type="number" step="0.01" value="20"></div>
-      <div><label>Vinicius (%)</label><input id="viniciusLand" type="number" step="0.01" value="20"></div>
-      <div><label>Thomas (%)</label><input id="thomasLand" type="number" step="0.01" value="20"></div>
+      <div><label>B (%)</label><input id="BLand" type="number" step="0.01" value="40"></div>
+      <div><label>A (%)</label><input id="ALand" type="number" step="0.01" value="20"></div>
+      <div><label>V (%)</label><input id="VLand" type="number" step="0.01" value="20"></div>
+      <div><label>T (%)</label><input id="TLand" type="number" step="0.01" value="20"></div>
     </div>
     <div class="total-display" id="totalPercent">Total: 100%</div>
     <div class="warning" id="warning" style="display:none;">⚠️ A soma dos percentuais não é 100%</div>
@@ -51,10 +51,10 @@
   </div>
 <script>
 const fmt = v => new Intl.NumberFormat("pt-BR", {style:"currency",currency:"BRL"}).format(v);
-const ids = ["totalValue","keepPercent","lawyerFee","itcmd","biaLand","albertoLand","viniciusLand","thomasLand"];
+const ids = ["totalValue","keepPercent","lawyerFee","itcmd","BLand","ALand","VLand","TLand"];
 const inp = ids.reduce((o,id) => (o[id]=document.getElementById(id),o), {});
 
-const inherit = {bia: 33.33, alberto: 5.55, vinicius: 5.55, thomas: 5.55};
+const inherit = {B: 33.33, A: 5.55, V: 5.55, T: 5.55};
 
 function calc(){
   const t = +inp.totalValue.value || 0;
@@ -73,10 +73,10 @@ function calc(){
   const totalFees = lawyerCost + itcmdCost;
   
   const landSplits = {
-    bia: +inp.biaLand.value, 
-    alberto: +inp.albertoLand.value, 
-    vinicius: +inp.viniciusLand.value, 
-    thomas: +inp.thomasLand.value
+    B: +inp.BLand.value, 
+    A: +inp.ALand.value, 
+    V: +inp.VLand.value, 
+    T: +inp.TLand.value
   };
   
   const totalLand = Object.values(landSplits).reduce((sum,v) => sum+v, 0);
