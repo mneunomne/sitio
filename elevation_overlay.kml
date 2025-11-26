@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>Elevation Overlay</name>
+    <GroundOverlay>
+      <name>Elevation Heightmap</name>
+      <Icon>
+        <href>elevation_heightmap.png</href>
+      </Icon>
+      <LatLonBox>
+        <north>-22.335050089843747</north>
+        <south>-22.38257091015625</south>
+        <east>-43.00986765625</east>
+        <west>-43.07531234375</west>
+        <rotation>0</rotation>
+      </LatLonBox>
+    </GroundOverlay>
+  </Document>
+</kml>
