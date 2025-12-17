@@ -135,7 +135,7 @@ function calc(){
   const kept = t * k / 100;
   const sale = t - kept;
   
-  const cousins = sale / 2;
+  const cousins = sale / 2 ;
   const ourTotal = sale / 2;
   
   const lawyerCost = ourTotal * (lawyerPct / 100);
@@ -159,8 +159,8 @@ function calc(){
     <div class='result-row'><div>Valor da venda:</div><div class='result-value'>${fmt(sale)}</div></div>
     <div class='result-row'><div>Valor da área que vamos ficar:</div><div class='result-value'>${fmt(kept)}</div></div>
     <hr>
-    <div class='result-row'><div>Primas (50% da venda):</div><div class='result-value'>${fmt(cousins)}</div></div>
-    <div class='result-row'><div>Nossa parte (50% da venda):</div><div class='result-value'>${fmt(ourTotal)}</div></div>
+    <div class='result-row'><div>Primas (50% da venda + metade da área que vamos ficar):</div><div class='result-value'>${fmt(cousins + kept/2) }</div></div>
+    <div class='result-row'><div>Nossa parte (50% da venda - metade da área que vamos ficar):</div><div class='result-value'>${fmt(ourTotal - kept/2)}</div></div>
     <hr>
     <div class='result-row'><div>Advogado (${lawyerPct}%):</div><div class='result-value'>${fmt(lawyerCost)}</div></div>
     <div class='result-row'><div>ITCMD (${itcmdPct}%):</div><div class='result-value'>${fmt(itcmdCost)}</div></div>
